@@ -1,11 +1,14 @@
+// app/signup.tsx
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
+import { useDispatch, useSelector } from "react-redux";
 import Logo from "../components/Logo";
 import Button from "../components/Button";
-import { registerUser } from "../src/services/authService";
+import { signupRequest, clearError } from "../src/store/slices/authSlice";
 import { Feather } from "@expo/vector-icons";
 import { SIZES } from "../constants/theme";
+import type { RootState, AppDispatch } from "../src/store";
 
 export default function SignupScreen() {
   const [fullName, setFullName] = useState("");
@@ -14,10 +17,25 @@ export default function SignupScreen() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [focusedInput, setFocusedInput] = useState("");
   const [errors, setErrors] = useState({ fullName: "", email: "", password: "", confirmPassword: "" });
-  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  // Redirect to home if authenticated (after successful signup + auto-login)
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace("/home");
+    }
+  }, [isAuthenticated, router]);
+
+  // Clear Redux error when component mounts
+  useEffect(() => {
+    if (error) {
+      dispatch(clearError());
+    }
+  }, [dispatch, error]); // Fixed: Only clear on mount, not on every input change
 
   const validate = () => {
     let valid = true;
@@ -35,24 +53,11 @@ export default function SignupScreen() {
     return valid;
   };
 
-  const handleSignup = async () => {
+  const handleSignup = () => {
     if (!validate()) return;
 
-    try {
-      setLoading(true);
-      const res = await registerUser(fullName, email, password);
-      setLoading(false);
-
-      if (res.token) {
-        alert("Signup success");
-        router.replace("/login");
-      } else {
-        alert(res.message || "Signup failed");
-      }
-    } catch {
-      setLoading(false);
-      alert("Server error");
-    }
+    // Dispatch signup request - Saga will handle the async operation
+    dispatch(signupRequest({ fullName, email, password }));
   };
 
   return (
@@ -62,6 +67,13 @@ export default function SignupScreen() {
         <Text style={styles.title}>Create Account</Text>
         <Text style={styles.subtitle}>Join Filmy Talks</Text>
 
+        {/* Show Redux error if any */}
+        {error && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.reduxError}>{error}</Text>
+          </View>
+        )}
+
         <View style={styles.form}>
           {/* Full Name */}
           <View style={styles.inputContainer}>
@@ -69,7 +81,7 @@ export default function SignupScreen() {
               <Feather name="user" size={20} color="#999" style={{ marginRight: SIZES.spacing.sm }} />
               <TextInput
                 style={[styles.input, focusedInput === "fullName" && styles.inputFocused]}
-                placeholder="Enter your First and Last Name"
+                placeholder="Enter your Full Name"
                 placeholderTextColor="#999"
                 value={fullName}
                 onChangeText={setFullName}
@@ -176,6 +188,13 @@ const styles = StyleSheet.create({
   input: { flex: 1, padding: SIZES.spacing.lg, fontSize: 16, color: "#211e1f" },
   inputFocused: { borderColor: "#e3720b", backgroundColor: "#fff" },
   error: { color: "red", marginTop: 4, fontSize: 12 },
+  errorContainer: {
+    backgroundColor: "#ffeaea",
+    padding: SIZES.spacing.md,
+    borderRadius: SIZES.borderRadius.medium,
+    marginBottom: SIZES.spacing.lg,
+  },
+  reduxError: { color: "red", textAlign: "center" },
   buttonContainer: { padding: SIZES.spacing.lg, paddingBottom: SIZES.spacing.xl + 20 },
   signupContainer: { flexDirection: "row", justifyContent: "center", marginTop: SIZES.spacing.lg },
   signupText: { color: "#666", fontSize: 15 },

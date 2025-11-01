@@ -1,23 +1,41 @@
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Add useEffect import
 import { useRouter } from "expo-router";
+import { useDispatch, useSelector } from "react-redux";
+import { Feather } from "@expo/vector-icons";
+
 import Logo from "../components/Logo";
 import Button from "../components/Button";
-import { loginUser } from "../src/services/authService";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Feather } from "@expo/vector-icons";
+import { loginRequest, clearError } from "../src/store/slices/authSlice";
 import { SIZES } from '../constants/theme';
+import type { RootState, AppDispatch } from "../src/store";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [focusedInput, setFocusedInput] = useState("");
   const [errors, setErrors] = useState({ email: "", password: "" });
-  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
+  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth); // Add isAuthenticated
 
+  // Clear Redux error when component mounts
+  useEffect(() => {
+    if (error) {
+      dispatch(clearError());
+    }
+  }, [dispatch, error]); // Fixed: useEffect instead of useState
+
+  // Redirect when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace("/home");
+    }
+  }, [isAuthenticated, router]);
+
+  // Validation
   const validate = () => {
     let valid = true;
     const newErrors = { email: "", password: "" };
@@ -43,28 +61,12 @@ export default function LoginScreen() {
     return valid;
   };
 
-  const handleLogin = async () => {
+  // Handle Login - Now using Redux Saga
+  const handleLogin = () => {
     if (!validate()) return;
-
-    try {
-      setLoading(true);
-      const response = await loginUser(email, password);
-      setLoading(false);
-
-      if (response?.success && response.token) {
-        await AsyncStorage.setItem(
-          "userData",
-          JSON.stringify({ fullName: response.user.fullName, token: response.token })
-        );
-        router.replace("/home");
-      } else {
-        alert(response.message || "Invalid login! Check your email and password.");
-      }
-    } catch (error) {
-      setLoading(false);
-      console.log("Login error:", error);
-      alert("Something went wrong! Try again.");
-    }
+    
+    // Dispatch login request - Saga will handle the async operation
+    dispatch(loginRequest({ email, password }));
   };
 
   return (
@@ -73,6 +75,13 @@ export default function LoginScreen() {
         <Logo />
         <Text style={styles.title}>Sign In</Text>
         <Text style={styles.subtitle}>Welcome back to Filmy Talks!</Text>
+
+        {/* Show Redux error if any */}
+        {error && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.reduxError}>{error}</Text>
+          </View>
+        )}
 
         <View style={styles.form}>
           {/* Email */}
@@ -118,7 +127,11 @@ export default function LoginScreen() {
       </View>
 
       <View style={styles.buttonContainer}>
-        {loading ? <ActivityIndicator size="large" color="#e3720b" /> : <Button title="Sign In" onPress={handleLogin} />}
+        {loading ? (
+          <ActivityIndicator size="large" color="#e3720b" />
+        ) : (
+          <Button title="Sign In" onPress={handleLogin} />
+        )}
         <View style={styles.signupContainer}>
           <Text style={styles.signupText}>Do not have an account? </Text>
           <TouchableOpacity onPress={() => router.push("/signup")}>
@@ -137,7 +150,6 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 16, color: "#666", marginBottom: SIZES.spacing.lg },
   form: { width: "100%" },
   inputContainer: { marginBottom: SIZES.spacing.lg },
-  label: { fontSize: 14, fontWeight: "600", color: "#211e1f", marginBottom: SIZES.spacing.sm },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
@@ -150,6 +162,13 @@ const styles = StyleSheet.create({
   input: { flex: 1, padding: SIZES.spacing.lg, fontSize: 16, color: "#211e1f" },
   inputFocused: { borderColor: "#e3720b", backgroundColor: "#fff" },
   error: { color: "red", marginTop: 4, fontSize: 12 },
+  errorContainer: {
+    backgroundColor: "#ffeaea",
+    padding: SIZES.spacing.md,
+    borderRadius: SIZES.borderRadius.medium,
+    marginBottom: SIZES.spacing.lg,
+  },
+  reduxError: { color: "red", textAlign: "center" },
   buttonContainer: { padding: SIZES.spacing.lg, paddingBottom: SIZES.spacing.xl + 20 },
   signupContainer: { flexDirection: "row", justifyContent: "center", marginTop: SIZES.spacing.lg },
   signupText: { color: "#666", fontSize: 15 },
