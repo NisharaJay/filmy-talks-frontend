@@ -1,5 +1,5 @@
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
-import { useState, useEffect } from "react"; // Add useEffect import
+import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 import { useDispatch, useSelector } from "react-redux";
 import { Feather } from "@expo/vector-icons";
@@ -19,14 +19,13 @@ export default function LoginScreen() {
 
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth); // Add isAuthenticated
+  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
 
-  // Clear Redux error when component mounts
   useEffect(() => {
     if (error) {
       dispatch(clearError());
     }
-  }, [dispatch, error]); // Fixed: useEffect instead of useState
+  }, [dispatch, error]);
 
   // Redirect when authenticated
   useEffect(() => {
@@ -72,7 +71,7 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Logo />
+        <Logo/>
         <Text style={styles.title}>Sign In</Text>
         <Text style={styles.subtitle}>Welcome back to Filmy Talks!</Text>
 
@@ -153,7 +152,7 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#f7f5f5ff",
     borderRadius: SIZES.borderRadius.medium,
     borderWidth: 2,
     borderColor: "#f5f5f5",

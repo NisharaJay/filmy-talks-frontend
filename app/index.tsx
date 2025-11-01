@@ -25,7 +25,7 @@ export default function MainScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: "#fff" },
   content: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: SIZES.spacing.lg },
   title: { fontSize: 32, fontWeight: '700', color: '#211e1f', textAlign: 'center' },
   description: { textAlign: 'center', marginTop: SIZES.spacing.lg, color: '#4a4949ff', fontSize: 16, lineHeight: 24 },

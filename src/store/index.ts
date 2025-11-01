@@ -1,4 +1,3 @@
-// src/store/index.ts
 import { configureStore } from "@reduxjs/toolkit";
 import createSagaMiddleware from "redux-saga";
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist";
@@ -13,11 +12,6 @@ const persistConfig = {
   storage: AsyncStorage,
   whitelist: ["auth"], // Only persist auth
   version: 1,
-  // Optional: Add migration if you change state structure later
-  // migrate: (state) => {
-  //   if (!state) return Promise.resolve(undefined);
-  //   return Promise.resolve(state);
-  // },
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

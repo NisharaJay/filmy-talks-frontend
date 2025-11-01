@@ -1,4 +1,3 @@
-// app/signup.tsx
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
@@ -23,7 +22,7 @@ export default function SignupScreen() {
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
 
-  // Redirect to home if authenticated (after successful signup + auto-login)
+  // Redirect to home if authenticated
   useEffect(() => {
     if (isAuthenticated) {
       router.replace("/home");
@@ -35,7 +34,7 @@ export default function SignupScreen() {
     if (error) {
       dispatch(clearError());
     }
-  }, [dispatch, error]); // Fixed: Only clear on mount, not on every input change
+  }, [dispatch, error]);
 
   const validate = () => {
     let valid = true;
@@ -56,7 +55,7 @@ export default function SignupScreen() {
   const handleSignup = () => {
     if (!validate()) return;
 
-    // Dispatch signup request - Saga will handle the async operation
+    // Dispatch signup request
     dispatch(signupRequest({ fullName, email, password }));
   };
 
@@ -65,7 +64,7 @@ export default function SignupScreen() {
       <View style={styles.content}>
         <Logo />
         <Text style={styles.title}>Create Account</Text>
-        <Text style={styles.subtitle}>Join Filmy Talks</Text>
+        <Text style={styles.subtitle}>Join Filmy Talks!</Text>
 
         {/* Show Redux error if any */}
         {error && (
@@ -179,7 +178,7 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#f7f5f5ff",
     borderRadius: SIZES.borderRadius.medium,
     borderWidth: 2,
     borderColor: "#f5f5f5",

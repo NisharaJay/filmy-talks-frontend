@@ -1,4 +1,3 @@
-// hooks/useUserData.ts
 import { useSelector } from "react-redux";
 import type { RootState } from "../src/store";
 
