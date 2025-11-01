@@ -1,31 +1,6 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
+// Below are the colors that are used in the app. The colors are defined in the light and dark mode.
 
 import { Platform } from 'react-native';
-
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
-
-export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
-  },
-};
 
 export const Fonts = Platform.select({
   ios: {
@@ -51,3 +26,51 @@ export const Fonts = Platform.select({
     mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
   },
 });
+
+export const COLORS = {
+  primary: '#e3720b',
+  gold: '#ffd700',
+  dark: {
+    background: '#000',
+    card: '#1a1a1a',
+    cardBorder: '#2a2a2a',
+    text: '#fff',
+    textSecondary: '#ccc',
+    textTertiary: '#999',
+    placeholder: '#666',
+  },
+  light: {
+    background: '#f8f8f8',
+    card: '#fff',
+    cardBorder: '#f0f0f0',
+    text: '#000',
+    textSecondary: '#333',
+    textTertiary: '#666',
+    placeholder: '#999',
+  },
+};
+
+export const SIZES = {
+  borderRadius: {
+    small: 8,
+    medium: 12,
+    large: 15,
+    xlarge: 25,
+  },
+  spacing: {
+    xs: 4,
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 20,
+  },
+  image: {
+    card: {
+      width: 100,
+      height: 140,
+    },
+    banner: {
+      height: 200,
+    },
+  },
+};
