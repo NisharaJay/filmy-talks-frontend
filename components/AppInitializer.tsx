@@ -9,7 +9,6 @@ export default function AppInitializer({ children }: AppInitializerProps) {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Simulate any initial app loading
     const timer = setTimeout(() => {
       setIsReady(true);
     }, 500);
