@@ -16,8 +16,14 @@ export default function MovieModal({ visible, onClose, movie }: MovieModalProps)
   const { isDark } = useThemeToggle();
   const dispatch = useDispatch();
 
+  // Get both favorites from favorite slice and user's favorite IDs from auth slice
   const favorites = useSelector((state: RootState) => state.favorite.favorites);
-  const isFavorite = movie ? favorites.some(f => f._id === movie._id) : false;
+  const userFavorites = useSelector((state: RootState) => state.auth.user?.favorites || []);
+  
+  // Check if movie is favorite using both sources for redundancy
+  const isFavorite = movie ? 
+    (favorites.some(f => f._id === movie._id) || userFavorites.includes(movie._id)) 
+    : false;
 
   const toggleFavorite = () => {
     if (!movie) return;
@@ -52,7 +58,11 @@ export default function MovieModal({ visible, onClose, movie }: MovieModalProps)
         <View style={styles.modal}>
           {/* Header with Favorite and Close Buttons */}
           <View style={styles.headerButtons}>
-            <TouchableOpacity style={styles.favoriteBtn} onPress={toggleFavorite}>
+            <TouchableOpacity 
+              style={styles.favoriteBtn} 
+              onPress={toggleFavorite}
+              accessibilityLabel={isFavorite ? "Remove from favorites" : "Add to favorites"}
+            >
               <Ionicons
                 name={isFavorite ? "heart" : "heart-outline"}
                 size={26}
@@ -200,7 +210,6 @@ const createStyles = (isDark: boolean) =>
       alignItems: "center",
       marginBottom: 20,
       padding: 12,
-
     },
     starsRow: {
       flexDirection: "row",

@@ -1,29 +1,67 @@
-import { useEffect, useState } from "react";
-import { View, ActivityIndicator, Text } from "react-native";
+import { useEffect, useState, useRef } from "react";
+import { View, ActivityIndicator, Text, AppState, AppStateStatus } from "react-native";
+import { useAuth } from "../hooks/useAuth";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../src/store";
+import { fetchFavoritesRequest } from "../src/store/slices/favoriteSlice";
 
 interface AppInitializerProps {
   children: React.ReactNode;
 }
 
 export default function AppInitializer({ children }: AppInitializerProps) {
-  const [isReady, setIsReady] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading: authLoading, isAuthenticated } = useAuth(); 
+  const [ready, setReady] = useState(false);
+  const appState = useRef(AppState.currentState);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsReady(true);
-    }, 500);
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === "active" &&
+        isAuthenticated
+      ) {
+        console.log("App came to foreground, refreshing favorites...");
+        dispatch(fetchFavoritesRequest());
+      }
+      appState.current = nextAppState;
+    };
 
-    return () => clearTimeout(timer);
-  }, []);
+    const subscription = AppState.addEventListener("change", handleAppStateChange);
 
-  if (!isReady) {
+    return () => {
+      subscription.remove();
+    };
+  }, [isAuthenticated, dispatch]);
+
+  useEffect(() => {
+    if (!authLoading) {
+      setReady(true);
+      
+      // If user is authenticated, re-fetch favorites to populate the Redux store
+      if (isAuthenticated) {
+        console.log("App initialized, fetching favorites...");
+        dispatch(fetchFavoritesRequest());
+      }
+    }
+  }, [authLoading, isAuthenticated, dispatch]);
+
+  if (!ready) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#fff" }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#121212",
+        }}
+      >
         <ActivityIndicator size="large" color="#e3720b" />
-        <Text style={{ marginTop: 10 }}>Loading...</Text>
+        <Text style={{ color: "#fff", marginTop: 10 }}>Initializing...</Text>
       </View>
     );
   }
 
-  return <>{children}</>;
+  return children;
 }

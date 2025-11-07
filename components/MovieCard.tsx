@@ -7,6 +7,7 @@ import { Movie } from "../src/services/movieService";
 import { COLORS, SIZES } from "../constants/theme";
 import { RootState } from "../src/store";
 import { addFavoriteRequest, removeFavoriteRequest } from "../src/store/slices/favoriteSlice";
+import AlertMessage from "./AlertMessage";
 
 interface MovieCardProps {
   movie: Movie;
@@ -18,15 +19,30 @@ function MovieCard({ movie, onPress }: MovieCardProps) {
   const [imageError, setImageError] = useState(false);
   const dispatch = useDispatch();
 
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState<"success" | "error" | "info">("info");
+
   const favorites = useSelector((state: RootState) => state.favorite.favorites);
-  const isFavorite = favorites.some(f => f._id === movie._id);
+  const userFavorites = useSelector((state: RootState) => state.auth.user?.favorites || []);
+  
+  const isFavorite = favorites.some(f => f._id === movie._id) || 
+                    userFavorites.includes(movie._id);
 
   const toggleFavorite = () => {
     if (isFavorite) {
       dispatch(removeFavoriteRequest(movie._id));
+      setAlertMessage(`Removed "${movie.movieName}" from favorites`);
+      setAlertType("info");
     } else {
       dispatch(addFavoriteRequest(movie._id));
+      setAlertMessage(`Added "${movie.movieName}" to favorites`);
+      setAlertType("success");
     }
+    setAlertVisible(true);
+
+    // Auto-close after 2s
+    setTimeout(() => setAlertVisible(false), 2000);
   };
 
   const styles = useMemo(() => createStyles(isDark), [isDark]);
@@ -55,57 +71,70 @@ function MovieCard({ movie, onPress }: MovieCardProps) {
   };
 
   return (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={onPress}
-      activeOpacity={0.7}
-      accessible
-      accessibilityLabel={`View details for ${movie.movieName}`}
-      accessibilityRole="button"
-    >
-      <View style={styles.imageContainer}>{renderImage()}</View>
+    <>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={onPress}
+        activeOpacity={0.7}
+        accessible
+        accessibilityLabel={`View details for ${movie.movieName}`}
+        accessibilityRole="button"
+      >
+        <View style={styles.imageContainer}>{renderImage()}</View>
 
-      <View style={styles.details}>
-        {/* Movie name + favorite heart on same line */}
-        <View style={styles.titleRow}>
-          <Text style={styles.name} numberOfLines={1}>
-            {movie.movieName}
-          </Text>
-          <TouchableOpacity onPress={toggleFavorite} style={styles.favoriteBtnInline}>
-            <Ionicons
-              name={isFavorite ? "heart" : "heart-outline"}
-              size={24}
-              color={isFavorite ? "#e3720b" : isDark ? COLORS.dark.placeholder : COLORS.light.placeholder}
-            />
-          </TouchableOpacity>
+        <View style={styles.details}>
+          <View style={styles.titleRow}>
+            <Text style={styles.name} numberOfLines={1}>
+              {movie.movieName}
+            </Text>
+            <TouchableOpacity 
+              onPress={toggleFavorite} 
+              style={styles.favoriteBtnInline}
+              accessibilityLabel={isFavorite ? "Remove from favorites" : "Add to favorites"}
+            >
+              <Ionicons
+                name={isFavorite ? "heart" : "heart-outline"}
+                size={24}
+                color={isFavorite ? "#e3720b" : isDark ? COLORS.dark.placeholder : COLORS.light.placeholder}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.metaContainer}>
+            <View style={styles.metaItem}>
+              <Ionicons name="calendar-outline" size={14} color={COLORS.primary} />
+              <Text style={styles.metaText}>{movie.releaseYear}</Text>
+            </View>
+            <View style={styles.metaItem}>
+              <Ionicons name="pricetag-outline" size={14} color={COLORS.primary} />
+              <Text style={styles.metaText}>{movie.category}</Text>
+            </View>
+          </View>
+
+          {movie.description && (
+            <Text style={styles.description} numberOfLines={2}>
+              {movie.description}
+            </Text>
+          )}
         </View>
 
-        <View style={styles.metaContainer}>
-          <View style={styles.metaItem}>
-            <Ionicons name="calendar-outline" size={14} color={COLORS.primary} />
-            <Text style={styles.metaText}>{movie.releaseYear}</Text>
-          </View>
-          <View style={styles.metaItem}>
-            <Ionicons name="pricetag-outline" size={14} color={COLORS.primary} />
-            <Text style={styles.metaText}>{movie.category}</Text>
-          </View>
-        </View>
+        <Ionicons
+          name="chevron-forward"
+          size={20}
+          color={isDark ? COLORS.dark.placeholder : COLORS.light.textTertiary}
+          style={{ alignSelf: "center", marginLeft: 5 }}
+        />
+      </TouchableOpacity>
 
-        {movie.description && (
-          <Text style={styles.description} numberOfLines={2}>
-            {movie.description}
-          </Text>
-        )}
-      </View>
-
-      {/* Optional: Chevron remains */}
-      <Ionicons
-        name="chevron-forward"
-        size={20}
-        color={isDark ? COLORS.dark.placeholder : COLORS.light.textTertiary}
-        style={{ alignSelf: "center", marginLeft: 5 }}
+      {/* Alert without OK button */}
+      <AlertMessage
+        message={alertMessage}
+        type={alertType}
+        visible={alertVisible}
+        onClose={() => setAlertVisible(false)}
+        hideDefaultButton={true}
       />
-    </TouchableOpacity>
+    </>
   );
 }
 
@@ -136,10 +165,7 @@ const createStyles = (isDark: boolean) => {
       borderRadius: SIZES.borderRadius.medium,
       overflow: "hidden",
     },
-    image: {
-      width: "100%",
-      height: "100%",
-    },
+    image: { width: "100%", height: "100%" },
     placeholderImage: {
       width: "100%",
       height: "100%",
@@ -162,29 +188,14 @@ const createStyles = (isDark: boolean) => {
       fontSize: 18,
       fontWeight: "700",
       color: colors.text,
-      flexShrink: 1, // ensures long titles don't overflow
+      flexShrink: 1,
+      flex: 1,
+      marginRight: SIZES.spacing.sm,
     },
-    favoriteBtnInline: {
-      marginLeft: SIZES.spacing.sm,
-    },
-    metaContainer: {
-      marginBottom: SIZES.spacing.md,
-    },
-    metaItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 6,
-      marginBottom: 6,
-    },
-    metaText: {
-      fontSize: 14,
-      fontWeight: "600",
-      color: COLORS.primary,
-    },
-    description: {
-      fontSize: 13,
-      color: colors.textSecondary,
-      lineHeight: 18,
-    },
+    favoriteBtnInline: { padding: 4 },
+    metaContainer: { marginBottom: SIZES.spacing.md },
+    metaItem: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 6 },
+    metaText: { fontSize: 14, fontWeight: "600", color: COLORS.primary },
+    description: { fontSize: 13, color: colors.textSecondary, lineHeight: 18 },
   });
 };
