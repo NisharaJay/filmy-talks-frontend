@@ -19,12 +19,15 @@ function* handleLogin(action: PayloadAction<{ email: string; password: string }>
 
     if (response?.success && response.token) {
       const user: User = {
+        _id: response.user._id,
         fullName: response.user.fullName,
-        email: email,
+        email: response.user.email,
         token: response.token,
+        favorites: response.user.favorites || [],
       };
 
       yield put(loginSuccess({ user }));
+      // The favorite saga will handle fetching favorites after login success
     } else {
       yield put(
         loginFailure({

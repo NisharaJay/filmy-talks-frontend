@@ -1,5 +1,8 @@
 // movieService.ts
 import { API_BASE_URL } from "../config/api";
+import { Review as BackendReview } from "./reviewsService";
+
+export type { BackendReview };
 
 // Export the Movie interface
 export interface Movie {
@@ -13,9 +16,19 @@ export interface Movie {
   bannerImage?: string;
   rating?: number;
   cast?: string[];
-  reviews?: { user?: string; comment: string; rating?: number }[];
+  reviews?: BackendReview[];
 }
 
+// Inside a service file (let's call this src/services/reviewService.ts)
+export interface Review {
+  _id: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  _userId: string;
+  fullName: string; // Make sure this exists
+  email: string;
+}
 // Exported async function to fetch movies
 export const getAllMovies = async (): Promise<Movie[]> => {
   try {
@@ -39,7 +52,10 @@ export const getAllMovies = async (): Promise<Movie[]> => {
         _id: movie._id || movie.id || Math.random().toString(),
         movieName: movie.movieName || movie.title || movie.name || "Untitled",
         releaseYear:
-          movie.releaseYear || (movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : 2024),
+          movie.releaseYear ||
+          (movie.releaseDate
+            ? new Date(movie.releaseDate).getFullYear()
+            : 2024),
         status: movie.status || "Now Showing",
         category: movie.category || movie.genre || "General",
         Director: movie.Director || movie.director,
@@ -47,7 +63,15 @@ export const getAllMovies = async (): Promise<Movie[]> => {
         bannerImage: movie.bannerImage || movie.posterUrl || movie.poster,
         rating: movie.rating || movie.voteAverage || 0,
         cast: movie.cast || [],
-        reviews: movie.reviews || [],
+        reviews: (movie.reviews || []).map((review: any) => ({
+          _id: review._id,
+          rating: review.rating,
+          comment: review.comment,
+          createdAt: review.createdAt,
+          _userId: review._userId,
+          fullName: review.fullName,
+          email: review.email,
+        })),
       }));
     }
 
@@ -58,8 +82,8 @@ export const getAllMovies = async (): Promise<Movie[]> => {
   }
 };
 
+
 export const getMovieById = async (id: string): Promise<Movie> => {
   const res = await fetch(`${API_BASE_URL}/movies/${id}`);
   return await res.json();
 };
-

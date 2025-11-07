@@ -10,8 +10,8 @@ import { useThemeToggle } from "../../theme/ThemeContext";
 import { COLORS, SIZES } from "../../constants/theme";
 import { Movie } from "../../src/services/movieService";
 
-type CategoryType = "Past" | "Now Showing" | "Upcoming";
-const CATEGORIES: CategoryType[] = ["Past", "Now Showing", "Upcoming"];
+type CategoryType = "Past" | "Now Showing";
+const CATEGORIES: CategoryType[] = ["Past", "Now Showing"];
 
 export default function Movies() {
   const { isDark } = useThemeToggle();

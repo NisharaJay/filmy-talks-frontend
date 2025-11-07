@@ -1,3 +1,4 @@
+//movieSaga.ts
 import { call, put, takeLatest } from "redux-saga/effects";
 import { getAllMovies, Movie } from "../../services/movieService";
 import { fetchMoviesRequest, fetchMoviesSuccess, fetchMoviesFailure } from "../slices/movieSlice";
