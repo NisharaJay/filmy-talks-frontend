@@ -1,10 +1,8 @@
-// movieService.ts
 import { API_BASE_URL } from "../config/api";
 import { Review as BackendReview } from "./reviewsService";
 
 export type { BackendReview };
 
-// Export the Movie interface
 export interface Movie {
   _id: string;
   movieName: string;
@@ -19,17 +17,16 @@ export interface Movie {
   reviews?: BackendReview[];
 }
 
-// Inside a service file (let's call this src/services/reviewService.ts)
 export interface Review {
   _id: string;
   rating: number;
   comment: string;
   createdAt: string;
   _userId: string;
-  fullName: string; // Make sure this exists
+  fullName: string;
   email: string;
 }
-// Exported async function to fetch movies
+
 export const getAllMovies = async (): Promise<Movie[]> => {
   try {
     console.log("Fetching movies from API:", `${API_BASE_URL}/movies`);
@@ -81,7 +78,6 @@ export const getAllMovies = async (): Promise<Movie[]> => {
     return [];
   }
 };
-
 
 export const getMovieById = async (id: string): Promise<Movie> => {
   const res = await fetch(`${API_BASE_URL}/movies/${id}`);

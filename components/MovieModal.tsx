@@ -16,11 +16,9 @@ export default function MovieModal({ visible, onClose, movie }: MovieModalProps)
   const { isDark } = useThemeToggle();
   const dispatch = useDispatch();
 
-  // Get both favorites from favorite slice and user's favorite IDs from auth slice
   const favorites = useSelector((state: RootState) => state.favorite.favorites);
   const userFavorites = useSelector((state: RootState) => state.auth.user?.favorites || []);
   
-  // Check if movie is favorite using both sources for redundancy
   const isFavorite = movie ? 
     (favorites.some(f => f._id === movie._id) || userFavorites.includes(movie._id)) 
     : false;

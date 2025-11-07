@@ -41,7 +41,6 @@ function MovieCard({ movie, onPress }: MovieCardProps) {
     }
     setAlertVisible(true);
 
-    // Auto-close after 2s
     setTimeout(() => setAlertVisible(false), 2000);
   };
 
