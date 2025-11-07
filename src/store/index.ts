@@ -1,4 +1,3 @@
-// src/store/store.ts
 import { configureStore } from "@reduxjs/toolkit";
 import createSagaMiddleware from "redux-saga";
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist";
@@ -11,7 +10,7 @@ const sagaMiddleware = createSagaMiddleware();
 const persistConfig = {
   key: "root",
   storage: AsyncStorage,
-  whitelist: ["auth"], // Only persist auth, not movies
+  whitelist: ["auth"],
   version: 1,
 };
 

@@ -39,7 +39,6 @@ export default function AppInitializer({ children }: AppInitializerProps) {
     if (!authLoading) {
       setReady(true);
       
-      // If user is authenticated, re-fetch favorites to populate the Redux store
       if (isAuthenticated) {
         console.log("App initialized, fetching favorites...");
         dispatch(fetchFavoritesRequest());
