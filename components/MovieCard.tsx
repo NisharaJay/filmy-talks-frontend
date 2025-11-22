@@ -125,7 +125,6 @@ function MovieCard({ movie, onPress }: MovieCardProps) {
         />
       </TouchableOpacity>
 
-      {/* Alert without OK button */}
       <AlertMessage
         message={alertMessage}
         type={alertType}

@@ -68,7 +68,7 @@ export default function MovieModal({
 
   if (!movie) return null;
 
-  const renderStars = (rating: number, interactive = false, size = 15) => (
+  const renderStars = (rating: number, interactive = false, size = 17) => (
     <View style={styles.starsRow}>
       {Array.from({ length: 5 }).map((_, i) => {
         const starValue = i + 1;
@@ -175,6 +175,11 @@ export default function MovieModal({
                 <Text style={styles.desc}>{movie.description}</Text>
               </View>
             )}
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Director</Text>
+              <Text style={styles.desc}>{movie.Director}</Text>
+            </View>
 
             {movie.cast && movie.cast.length > 0 && (
               <View style={styles.section}>

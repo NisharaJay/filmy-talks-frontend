@@ -84,7 +84,6 @@ const authSlice = createSlice({
       state.error = null;
     },
 
-    // Clear errors
     clearError: (state) => {
       state.error = null;
     },

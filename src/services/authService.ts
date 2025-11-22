@@ -38,7 +38,6 @@ export const registerUser = async (fullName: string, email: string, password: st
   });
 };
 
-// Validate token (optional - for token refresh/validation)
 export const validateToken = async (token: string) => {
   return makeRequest("/auth/validate", {
     method: "POST",

@@ -1,4 +1,5 @@
-import { call, put, takeLatest, takeEvery } from "redux-saga/effects";
+import { call, put, takeLatest, takeEvery, select } from "redux-saga/effects";
+import { SagaIterator } from "redux-saga";
 import {
   addFavorite,
   removeFavorite,
@@ -16,32 +17,25 @@ import {
   fetchFavoritesFailure,
 } from "../slices/favoriteSlice";
 import { loginSuccess, updateUserFavorites } from "../slices/authSlice";
-import { PayloadAction } from "@reduxjs/toolkit";
-import { Movie } from "../../services/movieService";
 
-function* fetchFavoritesSaga(): Generator<any, void, Movie[]> {
+// Selector to get token
+const getToken = (state: any) => state.auth.user?.token;
+
+function* fetchFavoritesSaga(): SagaIterator {
   try {
-    console.log("fetchFavoritesSaga: Fetching favorites...");
-    const response: Movie[] = yield call(getFavorites);
-    console.log("fetchFavoritesSaga: Favorites fetched successfully", response.length);
+    const token: string = yield select(getToken);
+    const response = yield call(getFavorites, token);
     yield put(fetchFavoritesSuccess(response));
   } catch (error: any) {
-    console.log("fetchFavoritesSaga: Error fetching favorites", error.message);
     yield put(fetchFavoritesFailure(error.message));
   }
 }
 
-// New saga to handle favorites fetch after login
-function* handleLoginSuccess(): Generator<any, void, any> {
-  yield put(fetchFavoritesRequest());
-}
-
-function* addFavoriteSaga(action: PayloadAction<string>): Generator<any, void, any> {
+function* addFavoriteSaga(action: any): SagaIterator {
   try {
-    const response: { favorites: Movie[] } = yield call(addFavorite, action.payload);
-
-    const ids = response.favorites.map((movie: Movie) => movie._id);
-
+    const token: string = yield select(getToken);
+    const response = yield call(addFavorite, action.payload, token);
+    const ids = response.favorites.map((movie: any) => movie._id);
     yield put(addFavoriteSuccess(response.favorites));
     yield put(updateUserFavorites(ids));
   } catch (error: any) {
@@ -49,11 +43,11 @@ function* addFavoriteSaga(action: PayloadAction<string>): Generator<any, void, a
   }
 }
 
-function* removeFavoriteSaga(action: PayloadAction<string>): Generator<any, void, any> {
+function* removeFavoriteSaga(action: any): SagaIterator {
   try {
-    const response: { favorites: Movie[] } = yield call(removeFavorite, action.payload);
-    const ids = response.favorites.map((movie: Movie) => movie._id);
-
+    const token: string = yield select(getToken);
+    const response = yield call(removeFavorite, action.payload, token);
+    const ids = response.favorites.map((movie: any) => movie._id);
     yield put(removeFavoriteSuccess(response.favorites));
     yield put(updateUserFavorites(ids));
   } catch (error: any) {
@@ -61,7 +55,11 @@ function* removeFavoriteSaga(action: PayloadAction<string>): Generator<any, void
   }
 }
 
-export default function* favoriteSaga() {
+function* handleLoginSuccess(): SagaIterator {
+  yield put(fetchFavoritesRequest());
+}
+
+export default function* favoriteSaga(): SagaIterator {
   yield takeLatest(fetchFavoritesRequest.type, fetchFavoritesSaga);
   yield takeLatest(addFavoriteRequest.type, addFavoriteSaga);
   yield takeLatest(removeFavoriteRequest.type, removeFavoriteSaga);

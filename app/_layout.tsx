@@ -11,7 +11,7 @@ export default function RootLayout() {
     <Provider store={store}>
       <PersistGate
         loading={
-          <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#fff" }}>
             <Text>Loading...</Text>
           </View>
         }
@@ -19,7 +19,12 @@ export default function RootLayout() {
       >
         <AppThemeProvider>
           <AppInitializer>
-            <Stack screenOptions={{ headerShown: false }} />
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: "#fff" },
+              }}
+            />
           </AppInitializer>
         </AppThemeProvider>
       </PersistGate>

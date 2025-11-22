@@ -1,4 +1,14 @@
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from "react-native";
 import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,18 +32,12 @@ export default function SignupScreen() {
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
 
-  // Redirect to home if authenticated
   useEffect(() => {
-    if (isAuthenticated) {
-      router.replace("/home");
-    }
+    if (isAuthenticated) router.replace("/home");
   }, [isAuthenticated, router]);
 
-  // Clear Redux error when component mounts
   useEffect(() => {
-    if (error) {
-      dispatch(clearError());
-    }
+    if (error) dispatch(clearError());
   }, [dispatch, error]);
 
   const validate = () => {
@@ -54,127 +58,148 @@ export default function SignupScreen() {
 
   const handleSignup = () => {
     if (!validate()) return;
-
-    // Dispatch signup request
     dispatch(signupRequest({ fullName, email, password }));
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <Logo />
-        <Text style={styles.title}>Create Account</Text>
-        <Text style={styles.subtitle}>Join Filmy Talks!</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: "#fff" }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 20}
+    >
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "flex-start" }}
+      >
+        <View style={styles.container}>
+          <View style={styles.content}>
+            <Logo />
+            <Text style={styles.title}>Create Account</Text>
+            <Text style={styles.subtitle}>Join Filmy Talks!</Text>
 
-        {/* Show Redux error if any */}
-        {error && (
-          <View style={styles.errorContainer}>
-            <Text style={styles.reduxError}>{error}</Text>
-          </View>
-        )}
+            {error && (
+              <View style={styles.errorContainer}>
+                <Text style={styles.reduxError}>{error}</Text>
+              </View>
+            )}
 
-        <View style={styles.form}>
-          {/* Full Name */}
-          <View style={styles.inputContainer}>
-            <View style={styles.inputWrapper}>
-              <Feather name="user" size={20} color="#999" style={{ marginRight: SIZES.spacing.sm }} />
-              <TextInput
-                style={[styles.input, focusedInput === "fullName" && styles.inputFocused]}
-                placeholder="Enter your Full Name"
-                placeholderTextColor="#999"
-                value={fullName}
-                onChangeText={setFullName}
-                onFocus={() => setFocusedInput("fullName")}
-                onBlur={() => setFocusedInput("")}
-              />
+            <View style={styles.form}>
+              {/* Full Name */}
+              <View style={styles.inputContainer}>
+                <View style={styles.inputWrapper}>
+                  <Feather name="user" size={20} color="#999" style={{ marginRight: SIZES.spacing.sm }} />
+                  <TextInput
+                    style={[styles.input, focusedInput === "fullName" && styles.inputFocused]}
+                    placeholder="Enter your Full Name"
+                    placeholderTextColor="#999"
+                    value={fullName}
+                    onChangeText={setFullName}
+                    onFocus={() => setFocusedInput("fullName")}
+                    onBlur={() => setFocusedInput("")}
+                  />
+                </View>
+                {errors.fullName && <Text style={styles.error}>{errors.fullName}</Text>}
+              </View>
+
+              {/* Email */}
+              <View style={styles.inputContainer}>
+                <View style={styles.inputWrapper}>
+                  <Feather name="mail" size={20} color="#999" style={{ marginRight: SIZES.spacing.sm }} />
+                  <TextInput
+                    style={[styles.input, focusedInput === "email" && styles.inputFocused]}
+                    placeholder="Enter your email"
+                    placeholderTextColor="#999"
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    onFocus={() => setFocusedInput("email")}
+                    onBlur={() => setFocusedInput("")}
+                  />
+                </View>
+                {errors.email && <Text style={styles.error}>{errors.email}</Text>}
+              </View>
+
+              {/* Password */}
+              <View style={styles.inputContainer}>
+                <View style={styles.inputWrapper}>
+                  <Feather name="lock" size={20} color="#999" style={{ marginRight: SIZES.spacing.sm }} />
+                  <TextInput
+                    style={[styles.input, focusedInput === "password" && styles.inputFocused]}
+                    placeholder="Enter your password"
+                    placeholderTextColor="#999"
+                    secureTextEntry={!showPassword}
+                    value={password}
+                    onChangeText={setPassword}
+                    onFocus={() => setFocusedInput("password")}
+                    onBlur={() => setFocusedInput("")}
+                  />
+                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                    <Feather name={showPassword ? "eye" : "eye-off"} size={20} color="#999" />
+                  </TouchableOpacity>
+                </View>
+                {errors.password && <Text style={styles.error}>{errors.password}</Text>}
+              </View>
+
+              {/* Confirm Password */}
+              <View style={styles.inputContainer}>
+                <View style={styles.inputWrapper}>
+                  <Feather name="lock" size={20} color="#999" style={{ marginRight: SIZES.spacing.sm }} />
+                  <TextInput
+                    style={[styles.input, focusedInput === "confirmPassword" && styles.inputFocused]}
+                    placeholder="Confirm password"
+                    placeholderTextColor="#999"
+                    secureTextEntry={!showPassword}
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    onFocus={() => setFocusedInput("confirmPassword")}
+                    onBlur={() => setFocusedInput("")}
+                  />
+                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                    <Feather name={showPassword ? "eye" : "eye-off"} size={20} color="#999" />
+                  </TouchableOpacity>
+                </View>
+                {errors.confirmPassword && <Text style={styles.error}>{errors.confirmPassword}</Text>}
+              </View>
+
+              {/* Sign Up Button */}
+              <View style={styles.buttonContainer}>
+                {loading ? (
+                  <ActivityIndicator size="large" color="#e3720b" />
+                ) : (
+                  <Button title="Sign Up" onPress={handleSignup} />
+                )}
+              </View>
+
+              {/* Sign In Section just below the button */}
+              <View style={styles.signinContainer}>
+                <Text style={styles.signinText}>Already have an account? </Text>
+                <TouchableOpacity onPress={() => router.replace("/login")}>
+                  <Text style={styles.signinLink}>Sign In</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            {errors.fullName && <Text style={styles.error}>{errors.fullName}</Text>}
-          </View>
-
-          {/* Email */}
-          <View style={styles.inputContainer}>
-            <View style={styles.inputWrapper}>
-              <Feather name="mail" size={20} color="#999" style={{ marginRight: SIZES.spacing.sm }} />
-              <TextInput
-                style={[styles.input, focusedInput === "email" && styles.inputFocused]}
-                placeholder="Enter your email"
-                placeholderTextColor="#999"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                onFocus={() => setFocusedInput("email")}
-                onBlur={() => setFocusedInput("")}
-              />
-            </View>
-            {errors.email && <Text style={styles.error}>{errors.email}</Text>}
-          </View>
-
-          {/* Password */}
-          <View style={styles.inputContainer}>
-            <View style={styles.inputWrapper}>
-              <Feather name="lock" size={20} color="#999" style={{ marginRight: SIZES.spacing.sm }} />
-              <TextInput
-                style={[styles.input, focusedInput === "password" && styles.inputFocused]}
-                placeholder="Enter your password"
-                placeholderTextColor="#999"
-                secureTextEntry={!showPassword}
-                value={password}
-                onChangeText={setPassword}
-                onFocus={() => setFocusedInput("password")}
-                onBlur={() => setFocusedInput("")}
-              />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <Feather name={showPassword ? "eye" : "eye-off"} size={20} color="#999" />
-              </TouchableOpacity>
-            </View>
-            {errors.password && <Text style={styles.error}>{errors.password}</Text>}
-          </View>
-
-          {/* Confirm Password */}
-          <View style={styles.inputContainer}>
-            <View style={styles.inputWrapper}>
-              <Feather name="lock" size={20} color="#999" style={{ marginRight: SIZES.spacing.sm }} />
-              <TextInput
-                style={[styles.input, focusedInput === "confirmPassword" && styles.inputFocused]}
-                placeholder="Confirm password"
-                placeholderTextColor="#999"
-                secureTextEntry={!showPassword}
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                onFocus={() => setFocusedInput("confirmPassword")}
-                onBlur={() => setFocusedInput("")}
-              />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <Feather name={showPassword ? "eye" : "eye-off"} size={20} color="#999" />
-              </TouchableOpacity>
-            </View>
-            {errors.confirmPassword && <Text style={styles.error}>{errors.confirmPassword}</Text>}
           </View>
         </View>
-      </View>
-
-      <View style={styles.buttonContainer}>
-        {loading ? <ActivityIndicator size="large" color="#e3720b" /> : <Button title="Sign Up" onPress={handleSignup} />}
-        <View style={styles.signupContainer}>
-          <Text style={styles.signupText}>Already have an account? </Text>
-          <TouchableOpacity onPress={() => router.replace("/login")}>
-            <Text style={styles.signupLink}>Sign In</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: SIZES.spacing.md, paddingTop: SIZES.spacing.xl + 20 },
-  content: { flex: 1, padding: SIZES.spacing.lg, paddingTop: SIZES.spacing.xl },
+  container: { 
+    backgroundColor: "#fff", 
+    padding: SIZES.spacing.md,
+  },
+  content: { 
+    padding: SIZES.spacing.lg, 
+    paddingTop: SIZES.spacing.xl + 20,
+  },
   title: { fontSize: 32, fontWeight: "700", color: "#211e1f", marginBottom: SIZES.spacing.sm },
   subtitle: { fontSize: 16, color: "#666", marginBottom: SIZES.spacing.xl },
   form: { width: "100%" },
   inputContainer: { marginBottom: SIZES.spacing.lg },
-  label: { fontSize: 14, fontWeight: "600", color: "#211e1f", marginBottom: SIZES.spacing.sm },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
@@ -194,8 +219,15 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.spacing.lg,
   },
   reduxError: { color: "red", textAlign: "center" },
-  buttonContainer: { padding: SIZES.spacing.lg, paddingBottom: SIZES.spacing.xl + 20 },
-  signupContainer: { flexDirection: "row", justifyContent: "center", marginTop: SIZES.spacing.lg },
-  signupText: { color: "#666", fontSize: 15 },
-  signupLink: { color: "#e3720b", fontSize: 15, fontWeight: "700" },
+  buttonContainer: {
+    marginTop: SIZES.spacing.md,
+    marginBottom: SIZES.spacing.sm,
+  },
+  signinContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: SIZES.spacing.md, // spacing from button
+  },
+  signinText: { color: "#666", fontSize: 15 },
+  signinLink: { color: "#e3720b", fontSize: 15, fontWeight: "700" },
 });
