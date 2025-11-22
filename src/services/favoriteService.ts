@@ -1,4 +1,3 @@
-// favoriteService.ts
 import { API_BASE_URL } from "../config/api";
 
 export const addFavorite = async (movieId: string, token: string) => {

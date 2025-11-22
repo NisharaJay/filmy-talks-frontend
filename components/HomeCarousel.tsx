@@ -15,16 +15,13 @@ export default function CrossfadeImageSwitcher() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // Animate fade out
       Animated.timing(fadeAnim, {
         toValue: 0,
         duration: 1000,
         useNativeDriver: true,
       }).start(() => {
-        // Update current image index after fade out
         setCurrentIndex((prev) => (prev + 1) % images.length);
 
-        // Fade in new image
         Animated.timing(fadeAnim, {
           toValue: 1,
           duration: 1000,

@@ -25,6 +25,5 @@ export default function Index() {
     );
   }
 
-  // Ensure a full white background instead of null
   return <View style={{ flex: 1, backgroundColor: '#fff' }} />;
 }

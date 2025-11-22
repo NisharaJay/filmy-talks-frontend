@@ -41,7 +41,6 @@ function MovieCard({ movie, onPress }: MovieCardProps) {
     }
     setAlertVisible(true);
 
-    // Auto-close after 2s
     setTimeout(() => setAlertVisible(false), 2000);
   };
 
@@ -126,7 +125,6 @@ function MovieCard({ movie, onPress }: MovieCardProps) {
         />
       </TouchableOpacity>
 
-      {/* Alert without OK button */}
       <AlertMessage
         message={alertMessage}
         type={alertType}

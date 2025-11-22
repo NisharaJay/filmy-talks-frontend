@@ -57,7 +57,7 @@ function MovieCard({ movie, onPress, onRate }: MovieCardProps) {
           {movie.movieName}
         </Text>
 
-        {/* Meta info: year + category */}
+        {/* Movie year and category */}
         <View style={styles.metaContainer}>
           <View style={styles.metaItem}>
             <Ionicons name="pricetag-outline" size={14} color={COLORS.primary} />
@@ -72,7 +72,7 @@ function MovieCard({ movie, onPress, onRate }: MovieCardProps) {
           </Text>
         )}
 
-        {/* Rating + Rate button */}
+        {/* Rating and Rate button */}
         <View style={styles.ratingRow}>
           <View style={styles.ratingContainer}>
             <Ionicons name="star" size={16} color="#FFD700" />
@@ -86,7 +86,6 @@ function MovieCard({ movie, onPress, onRate }: MovieCardProps) {
         </View>
       </View>
 
-      {/* Optional chevron */}
       <Ionicons
         name="chevron-forward"
         size={20}

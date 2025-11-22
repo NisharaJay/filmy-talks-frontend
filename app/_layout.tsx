@@ -22,7 +22,7 @@ export default function RootLayout() {
             <Stack
               screenOptions={{
                 headerShown: false,
-                contentStyle: { backgroundColor: "#fff" }, // ensures all screens default to white
+                contentStyle: { backgroundColor: "#fff" },
               }}
             />
           </AppInitializer>

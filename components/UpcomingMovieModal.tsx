@@ -40,7 +40,6 @@ export default function MovieModal({ visible, onClose, movie }: MovieModalProps)
     <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.overlay}>
         <View style={styles.modal}>
-          {/* Header with Favorite and Close Buttons */}
           <View style={styles.headerButtons}>
             <TouchableOpacity 
               style={styles.favoriteBtn} 
