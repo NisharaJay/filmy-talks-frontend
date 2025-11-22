@@ -59,7 +59,7 @@ export default function Reviews() {
   const filteredMovies = useMemo(() => {
     return movies.filter(
       (m) =>
-        m.status === "Now Showing" &&
+        m.status === "Now Showing" || m.status === "Past" &&
         m.movieName.toLowerCase().includes(search.toLowerCase())
     );
   }, [search, movies]);

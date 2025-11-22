@@ -21,7 +21,7 @@ const initialState: AuthState = {
     fullName: "",
     email: "",
     token: "",
-    favorites: [], // ✅ ensure stored in redux
+    favorites: [],
   },
   loading: false,
   error: null,

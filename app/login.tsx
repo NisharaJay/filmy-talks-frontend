@@ -1,4 +1,14 @@
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from "react-native";
 import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,129 +32,124 @@ export default function LoginScreen() {
   const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    if (error) {
-      dispatch(clearError());
-    }
+    if (error) dispatch(clearError());
   }, [dispatch, error]);
 
-  // Redirect when authenticated
   useEffect(() => {
-    if (isAuthenticated) {
-      router.replace("/home");
-    }
+    if (isAuthenticated) router.replace("/home");
   }, [isAuthenticated, router]);
 
-  // Validation
   const validate = () => {
     let valid = true;
     const newErrors = { email: "", password: "" };
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!email) {
-      newErrors.email = "Email is required";
-      valid = false;
-    } else if (!emailRegex.test(email)) {
-      newErrors.email = "Enter a valid email";
-      valid = false;
-    }
+    if (!email) { newErrors.email = "Email is required"; valid = false; }
+    else if (!emailRegex.test(email)) { newErrors.email = "Enter a valid email"; valid = false; }
 
-    if (!password) {
-      newErrors.password = "Password is required";
-      valid = false;
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-      valid = false;
-    }
+    if (!password) { newErrors.password = "Password is required"; valid = false; }
+    else if (password.length < 6) { newErrors.password = "Password must be at least 6 characters"; valid = false; }
 
     setErrors(newErrors);
     return valid;
   };
 
-  // Handle Login - Now using Redux Saga
   const handleLogin = () => {
     if (!validate()) return;
-    
-    // Dispatch login request - Saga will handle the async operation
     dispatch(loginRequest({ email, password }));
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <Logo/>
-        <Text style={styles.title}>Sign In</Text>
-        <Text style={styles.subtitle}>Welcome back to Filmy Talks!</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: "#fff" }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 20}
+    >
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "flex-start" }}
+      >
+        <View style={styles.container}>
+          <View style={styles.content}>
+            <Logo />
+            <Text style={styles.title}>Sign In</Text>
+            <Text style={styles.subtitle}>Welcome back to Filmy Talks!</Text>
 
-        {/* Show Redux error if any */}
-        {error && (
-          <View style={styles.errorContainer}>
-            <Text style={styles.reduxError}>{error}</Text>
-          </View>
-        )}
+            {error && (
+              <View style={styles.errorContainer}>
+                <Text style={styles.reduxError}>{error}</Text>
+              </View>
+            )}
 
-        <View style={styles.form}>
-          {/* Email */}
-          <View style={styles.inputContainer}>
-            <View style={styles.inputWrapper}>
-              <Feather name="mail" size={20} color="#999" style={{ marginRight: SIZES.spacing.sm }} />
-              <TextInput
-                style={[styles.input, focusedInput === "email" && styles.inputFocused]}
-                placeholder="Enter your Email"
-                placeholderTextColor="#999"
-                value={email}
-                onChangeText={setEmail}
-                onFocus={() => setFocusedInput("email")}
-                onBlur={() => setFocusedInput("")}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
+            <View style={styles.form}>
+              {/* Email */}
+              <View style={styles.inputContainer}>
+                <View style={styles.inputWrapper}>
+                  <Feather name="mail" size={20} color="#999" style={{ marginRight: SIZES.spacing.sm }} />
+                  <TextInput
+                    style={[styles.input, focusedInput === "email" && styles.inputFocused]}
+                    placeholder="Enter your Email"
+                    placeholderTextColor="#999"
+                    value={email}
+                    onChangeText={setEmail}
+                    onFocus={() => setFocusedInput("email")}
+                    onBlur={() => setFocusedInput("")}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+                </View>
+                {errors.email && <Text style={styles.error}>{errors.email}</Text>}
+              </View>
+
+              {/* Password */}
+              <View style={styles.inputContainer}>
+                <View style={styles.inputWrapper}>
+                  <Feather name="lock" size={20} color="#999" style={{ marginRight: SIZES.spacing.sm }} />
+                  <TextInput
+                    style={[styles.input, focusedInput === "password" && styles.inputFocused]}
+                    placeholder="Enter your Password"
+                    placeholderTextColor="#999"
+                    secureTextEntry={!showPassword}
+                    value={password}
+                    onChangeText={setPassword}
+                    onFocus={() => setFocusedInput("password")}
+                    onBlur={() => setFocusedInput("")}
+                  />
+                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                    <Feather name={showPassword ? "eye" : "eye-off"} size={20} color="#999" />
+                  </TouchableOpacity>
+                </View>
+                {errors.password && <Text style={styles.error}>{errors.password}</Text>}
+              </View>
+
+              {/* Sign In Button */}
+              <View style={styles.buttonContainer}>
+                {loading ? (
+                  <ActivityIndicator size="large" color="#e3720b" />
+                ) : (
+                  <Button title="Sign In" onPress={handleLogin} />
+                )}
+              </View>
+
+              {/* Sign Up link below the button */}
+              <View style={styles.signupContainer}>
+                <Text style={styles.signupText}>Do not have an account? </Text>
+                <TouchableOpacity onPress={() => router.push("/signup")}>
+                  <Text style={styles.signupLink}>Sign Up</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            {errors.email ? <Text style={styles.error}>{errors.email}</Text> : null}
-          </View>
-
-          {/* Password */}
-          <View style={styles.inputContainer}>
-            <View style={styles.inputWrapper}>
-              <Feather name="lock" size={20} color="#999" style={{ marginRight: SIZES.spacing.sm }} />
-              <TextInput
-                style={[styles.input, focusedInput === "password" && styles.inputFocused]}
-                placeholder="Enter your Password"
-                placeholderTextColor="#999"
-                value={password}
-                secureTextEntry={!showPassword}
-                onChangeText={setPassword}
-                onFocus={() => setFocusedInput("password")}
-                onBlur={() => setFocusedInput("")}
-              />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <Feather name={showPassword ? "eye" : "eye-off"} size={20} color="#999" />
-              </TouchableOpacity>
-            </View>
-            {errors.password ? <Text style={styles.error}>{errors.password}</Text> : null}
           </View>
         </View>
-      </View>
-
-      <View style={styles.buttonContainer}>
-        {loading ? (
-          <ActivityIndicator size="large" color="#e3720b" />
-        ) : (
-          <Button title="Sign In" onPress={handleLogin} />
-        )}
-        <View style={styles.signupContainer}>
-          <Text style={styles.signupText}>Do not have an account? </Text>
-          <TouchableOpacity onPress={() => router.push("/signup")}>
-            <Text style={styles.signupLink}>Sign Up</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", padding: SIZES.spacing.md },
-  content: { flex: 1, padding: SIZES.spacing.lg, paddingTop: SIZES.spacing.xl + 20 },
+  content: { padding: SIZES.spacing.lg, paddingTop: SIZES.spacing.xl + 20 },
   title: { fontSize: 32, fontWeight: "700", color: "#211e1f", marginBottom: SIZES.spacing.sm },
   subtitle: { fontSize: 16, color: "#666", marginBottom: SIZES.spacing.lg },
   form: { width: "100%" },
@@ -168,8 +173,12 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.spacing.lg,
   },
   reduxError: { color: "red", textAlign: "center" },
-  buttonContainer: { padding: SIZES.spacing.lg, paddingBottom: SIZES.spacing.xl + 20 },
-  signupContainer: { flexDirection: "row", justifyContent: "center", marginTop: SIZES.spacing.lg },
+  buttonContainer: { marginTop: SIZES.spacing.md, marginBottom: SIZES.spacing.sm },
+  signupContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: SIZES.spacing.sm,
+  },
   signupText: { color: "#666", fontSize: 15 },
   signupLink: { color: "#e3720b", fontSize: 15, fontWeight: "700" },
 });

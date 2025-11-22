@@ -1,4 +1,3 @@
-// screens/Profile.tsx
 import React, { useEffect, useRef, useState } from "react";
 import {
   View,
@@ -41,7 +40,6 @@ export default function Profile() {
   const appStateRef = useRef(AppState.currentState);
   const hasFetchedRef = useRef(false);
 
-  // Fetch favorites on mount
   useEffect(() => {
     if (initialMountRef.current && isAuthenticated && user) {
       dispatch(fetchFavoritesRequest());
@@ -49,7 +47,6 @@ export default function Profile() {
     }
   }, [isAuthenticated, user, dispatch]);
 
-  // Fetch favorites on app foreground
   useEffect(() => {
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
       if (
@@ -70,7 +67,6 @@ export default function Profile() {
     return () => subscription.remove();
   }, [isAuthenticated, dispatch]);
 
-  // Retry fetch if needed
   useEffect(() => {
     if (
       user &&
@@ -94,7 +90,7 @@ export default function Profile() {
     setShowLogoutConfirm(false);
     setShowLogoutAlert(true);
     setTimeout(() => setShowLogoutAlert(false), 3000);
-    initialMountRef.current = true; // reset for next login
+    initialMountRef.current = true; 
   };
 
   return (

@@ -36,20 +36,6 @@ export default function MovieModal({ visible, onClose, movie }: MovieModalProps)
 
   const styles = createStyles(isDark);
 
-  const renderStars = (rating: number) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-
-    for (let i = 0; i < 5; i++) {
-      if (i < fullStars) stars.push(<Ionicons key={i} name="star" size={20} color="#ffd700" />);
-      else if (i === fullStars && hasHalfStar)
-        stars.push(<Ionicons key={i} name="star-half" size={20} color="#ffd700" />);
-      else stars.push(<Ionicons key={i} name="star-outline" size={20} color="#ffd700" />);
-    }
-    return stars;
-  };
-
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.overlay}>
@@ -94,14 +80,6 @@ export default function MovieModal({ visible, onClose, movie }: MovieModalProps)
                 <Text style={styles.badgeText}>{movie.category}</Text>
               </View>
             </View>
-
-            {/* Rating Section */}
-            {movie.rating !== undefined && (
-              <View style={styles.ratingContainer}>
-                <View style={styles.starsRow}>{renderStars(movie.rating)}</View>
-                <Text style={styles.ratingText}>{movie.rating.toFixed(1)}</Text>
-              </View>
-            )}
 
             {/* Description Section */}
             <View style={styles.section}>
@@ -208,22 +186,6 @@ const createStyles = (isDark: boolean) =>
       fontSize: 14,
       fontWeight: "600",
       color: "#e3720b",
-    },
-    ratingContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: 20,
-      padding: 12,
-    },
-    starsRow: {
-      flexDirection: "row",
-      gap: 4,
-      marginRight: 12,
-    },
-    ratingText: {
-      fontSize: 18,
-      fontWeight: "700",
-      color: isDark ? "#fff" : "#000",
     },
     section: {
       marginBottom: 20,
