@@ -1,23 +1,18 @@
-// Below are the colors that are used in the app. The colors are defined in the light and dark mode.
+import { Platform } from "react-native";
 
-import { Platform } from 'react-native';
-
+//FONTS
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
+    sans: "system-ui",       // System UI font
+    serif: "ui-serif",       // Serif font
+    rounded: "ui-rounded",   // Rounded font
+    mono: "ui-monospace",    // Monospace font
   },
   default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
+    sans: "normal",
+    serif: "serif",
+    rounded: "normal",
+    mono: "monospace",
   },
   web: {
     sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
@@ -27,29 +22,33 @@ export const Fonts = Platform.select({
   },
 });
 
+//COLORS
 export const COLORS = {
-  primary: '#e3720b',
-  gold: '#ffd700',
-  dark: {
-    background: '#000',
-    card: '#1a1a1a',
-    cardBorder: '#2a2a2a',
-    text: '#fff',
-    textSecondary: '#ccc',
-    textTertiary: '#999',
-    placeholder: '#666',
-  },
+  primary: "#e3720b",
+  gold: "#ffd700",
+
   light: {
-    background: '#f8f8f8',
-    card: '#fff',
-    cardBorder: '#f0f0f0',
-    text: '#000',
-    textSecondary: '#333',
-    textTertiary: '#666',
-    placeholder: '#999',
+    background: "#f8f8f8",
+    card: "#fff",
+    cardBorder: "#f0f0f0",
+    text: "#000",
+    textSecondary: "#333",
+    textTertiary: "#666",
+    placeholder: "#999",
+  },
+
+  dark: {
+    background: "#000",
+    card: "#1a1a1a",
+    cardBorder: "#2a2a2a",
+    text: "#fff",
+    textSecondary: "#ccc",
+    textTertiary: "#999",
+    placeholder: "#666",
   },
 };
 
+//SIZES
 export const SIZES = {
   borderRadius: {
     small: 8,
