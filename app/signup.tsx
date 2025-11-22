@@ -18,6 +18,7 @@ import { signupRequest, clearError } from "../src/store/slices/authSlice";
 import { Feather } from "@expo/vector-icons";
 import { SIZES } from "../constants/theme";
 import type { RootState, AppDispatch } from "../src/store";
+import { validateSignup } from "../src/utils/validation";
 
 export default function SignupScreen() {
   const [fullName, setFullName] = useState("");
@@ -25,12 +26,19 @@ export default function SignupScreen() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [focusedInput, setFocusedInput] = useState("");
-  const [errors, setErrors] = useState({ fullName: "", email: "", password: "", confirmPassword: "" });
+  const [errors, setErrors] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { loading, error, isAuthenticated } = useSelector(
+    (state: RootState) => state.auth
+  );
 
   useEffect(() => {
     if (isAuthenticated) router.replace("/home");
@@ -40,24 +48,16 @@ export default function SignupScreen() {
     if (error) dispatch(clearError());
   }, [dispatch, error]);
 
-  const validate = () => {
-    let valid = true;
-    const newErrors = { fullName: "", email: "", password: "", confirmPassword: "" };
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!fullName) { newErrors.fullName = "Full name is required"; valid = false; }
-    if (!email) { newErrors.email = "Email is required"; valid = false; }
-    else if (!emailRegex.test(email)) { newErrors.email = "Enter a valid email"; valid = false; }
-    if (!password) { newErrors.password = "Password is required"; valid = false; }
-    else if (password.length < 6) { newErrors.password = "Password must be at least 6 characters"; valid = false; }
-    if (password !== confirmPassword) { newErrors.confirmPassword = "Passwords do not match"; valid = false; }
-
-    setErrors(newErrors);
-    return valid;
-  };
-
   const handleSignup = () => {
-    if (!validate()) return;
+    const { errors: validationErrors, valid } = validateSignup({
+      fullName,
+      email,
+      password,
+      confirmPassword,
+    });
+    setErrors(validationErrors);
+    if (!valid) return;
+
     dispatch(signupRequest({ fullName, email, password }));
   };
 
@@ -88,9 +88,17 @@ export default function SignupScreen() {
               {/* Full Name */}
               <View style={styles.inputContainer}>
                 <View style={styles.inputWrapper}>
-                  <Feather name="user" size={20} color="#999" style={{ marginRight: SIZES.spacing.sm }} />
+                  <Feather
+                    name="user"
+                    size={20}
+                    color="#999"
+                    style={{ marginRight: SIZES.spacing.sm }}
+                  />
                   <TextInput
-                    style={[styles.input, focusedInput === "fullName" && styles.inputFocused]}
+                    style={[
+                      styles.input,
+                      focusedInput === "fullName" && styles.inputFocused,
+                    ]}
                     placeholder="Enter your Full Name"
                     placeholderTextColor="#999"
                     value={fullName}
@@ -99,15 +107,25 @@ export default function SignupScreen() {
                     onBlur={() => setFocusedInput("")}
                   />
                 </View>
-                {errors.fullName && <Text style={styles.error}>{errors.fullName}</Text>}
+                {errors.fullName && (
+                  <Text style={styles.error}>{errors.fullName}</Text>
+                )}
               </View>
 
               {/* Email */}
               <View style={styles.inputContainer}>
                 <View style={styles.inputWrapper}>
-                  <Feather name="mail" size={20} color="#999" style={{ marginRight: SIZES.spacing.sm }} />
+                  <Feather
+                    name="mail"
+                    size={20}
+                    color="#999"
+                    style={{ marginRight: SIZES.spacing.sm }}
+                  />
                   <TextInput
-                    style={[styles.input, focusedInput === "email" && styles.inputFocused]}
+                    style={[
+                      styles.input,
+                      focusedInput === "email" && styles.inputFocused,
+                    ]}
                     placeholder="Enter your email"
                     placeholderTextColor="#999"
                     value={email}
@@ -118,15 +136,25 @@ export default function SignupScreen() {
                     onBlur={() => setFocusedInput("")}
                   />
                 </View>
-                {errors.email && <Text style={styles.error}>{errors.email}</Text>}
+                {errors.email && (
+                  <Text style={styles.error}>{errors.email}</Text>
+                )}
               </View>
 
               {/* Password */}
               <View style={styles.inputContainer}>
                 <View style={styles.inputWrapper}>
-                  <Feather name="lock" size={20} color="#999" style={{ marginRight: SIZES.spacing.sm }} />
+                  <Feather
+                    name="lock"
+                    size={20}
+                    color="#999"
+                    style={{ marginRight: SIZES.spacing.sm }}
+                  />
                   <TextInput
-                    style={[styles.input, focusedInput === "password" && styles.inputFocused]}
+                    style={[
+                      styles.input,
+                      focusedInput === "password" && styles.inputFocused,
+                    ]}
                     placeholder="Enter your password"
                     placeholderTextColor="#999"
                     secureTextEntry={!showPassword}
@@ -135,19 +163,35 @@ export default function SignupScreen() {
                     onFocus={() => setFocusedInput("password")}
                     onBlur={() => setFocusedInput("")}
                   />
-                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                    <Feather name={showPassword ? "eye" : "eye-off"} size={20} color="#999" />
+                  <TouchableOpacity
+                    onPress={() => setShowPassword(!showPassword)}
+                  >
+                    <Feather
+                      name={showPassword ? "eye" : "eye-off"}
+                      size={20}
+                      color="#999"
+                    />
                   </TouchableOpacity>
                 </View>
-                {errors.password && <Text style={styles.error}>{errors.password}</Text>}
+                {errors.password && (
+                  <Text style={styles.error}>{errors.password}</Text>
+                )}
               </View>
 
               {/* Confirm Password */}
               <View style={styles.inputContainer}>
                 <View style={styles.inputWrapper}>
-                  <Feather name="lock" size={20} color="#999" style={{ marginRight: SIZES.spacing.sm }} />
+                  <Feather
+                    name="lock"
+                    size={20}
+                    color="#999"
+                    style={{ marginRight: SIZES.spacing.sm }}
+                  />
                   <TextInput
-                    style={[styles.input, focusedInput === "confirmPassword" && styles.inputFocused]}
+                    style={[
+                      styles.input,
+                      focusedInput === "confirmPassword" && styles.inputFocused,
+                    ]}
                     placeholder="Confirm password"
                     placeholderTextColor="#999"
                     secureTextEntry={!showPassword}
@@ -156,11 +200,19 @@ export default function SignupScreen() {
                     onFocus={() => setFocusedInput("confirmPassword")}
                     onBlur={() => setFocusedInput("")}
                   />
-                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                    <Feather name={showPassword ? "eye" : "eye-off"} size={20} color="#999" />
+                  <TouchableOpacity
+                    onPress={() => setShowPassword(!showPassword)}
+                  >
+                    <Feather
+                      name={showPassword ? "eye" : "eye-off"}
+                      size={20}
+                      color="#999"
+                    />
                   </TouchableOpacity>
                 </View>
-                {errors.confirmPassword && <Text style={styles.error}>{errors.confirmPassword}</Text>}
+                {errors.confirmPassword && (
+                  <Text style={styles.error}>{errors.confirmPassword}</Text>
+                )}
               </View>
 
               {/* Sign Up Button */}
@@ -188,15 +240,20 @@ export default function SignupScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    backgroundColor: "#fff", 
+  container: {
+    backgroundColor: "#fff",
     padding: SIZES.spacing.md,
   },
-  content: { 
-    padding: SIZES.spacing.lg, 
+  content: {
+    padding: SIZES.spacing.lg,
     paddingTop: SIZES.spacing.xl + 20,
   },
-  title: { fontSize: 32, fontWeight: "700", color: "#211e1f", marginBottom: SIZES.spacing.sm },
+  title: {
+    fontSize: 32,
+    fontWeight: "700",
+    color: "#211e1f",
+    marginBottom: SIZES.spacing.sm,
+  },
   subtitle: { fontSize: 16, color: "#666", marginBottom: SIZES.spacing.xl },
   form: { width: "100%" },
   inputContainer: { marginBottom: SIZES.spacing.lg },
