@@ -27,7 +27,6 @@ function* handleLogin(action: PayloadAction<{ email: string; password: string }>
       };
 
       yield put(loginSuccess({ user }));
-      // The favorite saga will handle fetching favorites after login success
     } else {
       yield put(
         loginFailure({
