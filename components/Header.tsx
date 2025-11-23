@@ -1,4 +1,4 @@
-import { Image, View, Text, StyleSheet } from "react-native";
+import { Image, View, Text, StyleSheet, StatusBar } from "react-native";
 import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 
@@ -18,24 +18,30 @@ export default function Header({ title }: HeaderProps) {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.contentContainer}>
-        {/* Greeting + Name */}
-        <View>
-          <Text style={styles.greeting}>{greeting}</Text>
-          <Text style={styles.title}>
-            {isAuthenticated && firstName ? `${firstName}!` : title}
-          </Text>
-        </View>
-        {/* Logo */}
-        <View>
-          <Image
-            source={require("../assets/white-logo.png")}
-            style={styles.logo}
-          />
+    <>
+       <StatusBar
+        barStyle="light-content"
+        backgroundColor="#211e1f"
+      />
+      <View style={styles.container}>
+        <View style={styles.contentContainer}>
+          {/* Greeting + Name */}
+          <View>
+            <Text style={styles.greeting}>{greeting}</Text>
+            <Text style={styles.title}>
+              {isAuthenticated && firstName ? `${firstName}!` : title}
+            </Text>
+          </View>
+          {/* Logo */}
+          <View>
+            <Image
+              source={require("../assets/white-logo.png")}
+              style={styles.logo}
+            />
+          </View>
         </View>
       </View>
-    </View>
+    </>
   );
 }
 

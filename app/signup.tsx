@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   signinContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    marginTop: SIZES.spacing.md, // spacing from button
+    marginTop: SIZES.spacing.md,
   },
   signinText: { color: "#666", fontSize: 15 },
   signinLink: { color: "#e3720b", fontSize: 15, fontWeight: "700" },
